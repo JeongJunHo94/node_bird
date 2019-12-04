@@ -7,7 +7,6 @@
       fixed
       app
     >
-    zz
       <v-list>
         <v-list-item
           v-for="(item, i) in items"
