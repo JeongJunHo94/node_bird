@@ -4,6 +4,7 @@
       <nuxt-link to="/">Home</nuxt-link>
       <nuxt-link to="/profile">Profile</nuxt-link>
       <nuxt-link to="/signup">Signnup</nuxt-link>
+      <nuxt-link to="/admin">Admin</nuxt-link>
     </nav>
     <nuxt />
   </div>
@@ -14,10 +15,5 @@ export default {
   data() {
     return {};
   }
-  // head() {
-  //   return {
-  //     title: "Nodebird"
-  //   };
-  // }
 };
 </script>
