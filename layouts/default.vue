@@ -34,7 +34,7 @@
     </nav>
     <v-row no-gutters>
       <v-col cols="12" xs="12" md="4">
-        <!-- <login-form /> -->
+        <login-form />
       </v-col>
       <v-col cols="12" xs="12" md="8">
         <nuxt />
@@ -44,14 +44,14 @@
 </template>
 
 <script>
+// 로그인폼 컴포넌트 연결 LoginForm
+// 아래의 ~표시는 루트폴더를 의미한다. 루트폴더와 소스폴더는 다르기 때문이다.
+// 상대경로가 많아지면 ../../../ 이런식으로 복잡해짐
+import LoginForm from "~/components/LoginForm";
+
 export default {
-  data() {
-    return {};
+  components: {
+    LoginForm
   }
-  // head() {
-  //   return {
-  //     title: "Nodebird"
-  //   };
-  // }
 };
 </script>
