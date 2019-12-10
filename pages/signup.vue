@@ -37,7 +37,7 @@
               v-model="terms"
               required
               :rules="[v => !!v || '약관에 동의해야 합니다.']"
-              label="쌉소리"
+              label="가입할래?"
             />
             <v-btn color="green" type="submit" :disabled="!valid"
               >가입하기</v-btn
@@ -76,11 +76,21 @@ export default {
   methods: {
     onSubmitForm() {
       if (this.$refs.form.validate()) {
-        alert("회원가입시도");
-      } else {
-        alert("폼이 유효하지 않습니다");
-      } //여기서 유효하면 valid=true, 유효하지 않으면 valid=false
-      console.log(this.valid);
+        this.$store
+          .dispatch("users/signUp", {
+            nickname: this.nickname,
+            email: this.email
+          })
+          .then(() => {
+            //actions이 비동기이기 때문에 then과 catch를 추가로 써줘야 순서를 보장받을수있다.
+            this.$router.push({
+              path: "/"
+            });
+          })
+          .catch(() => {
+            alert("회원가입 실패");
+          });
+      }
     }
   },
   head() {

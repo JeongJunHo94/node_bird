@@ -55,3 +55,11 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+a {
+  display: inline-block;
+  text-decoration: none;
+  color: inherit;
+}
+</style>

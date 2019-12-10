@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container v-if="!me">
     <!-- 옆의 태그들이 다닥다닥 붙어있으면 골치아프니 패딩을 준다 -->
     <v-card>
       <v-form ref="form" v-model="valid" @submit.prevent="onSubmitForm">
@@ -26,6 +26,10 @@
       </v-form>
     </v-card>
   </v-container>
+  <v-container v-else>
+    <v-card>{{ me.nickname }}님,로그인되었습니다.</v-card>
+    <v-btn @click="onLogOut">로그아웃</v-btn>
+  </v-container>
 </template>
 
 <script>
@@ -42,9 +46,22 @@ export default {
       passwordRules: [v => !!v || "비밀번호는 필수입니다."]
     };
   },
+  computed: {
+    me() {
+      return this.$store.state.users.me;
+    }
+  },
   methods: {
     onSubmitForm() {
-      this.$refs.form.validate();
+      if (this.$refs.form.validate()) {
+        this.$store.dispatch("users/logIn", {
+          email: this.email,
+          nickname: "test"
+        });
+      }
+    },
+    onLogOut() {
+      this.$store.dispatch("users/logOut");
     }
   }
 };
