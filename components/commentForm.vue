@@ -3,14 +3,19 @@
     ref="form"
     v-model="valid"
     style="position: relative"
-    @sbumit.prevent="onSubmitform"
+    @submit.prevent="onSubmitForm"
   >
-    <v-textare>
-      v-model="content" filled label="댓글 달기" :hide-details="hideDetails"
-      :success="success" :success-messages="successMessages"
+    <v-textarea
+      v-model="content"
+      filled
+      auto-grow
+      label="댓글 달기"
+      :hide-details="hideDetails"
+      :success="success"
+      :success-messages="successMessages"
       @input="onChangeTextarea"
-    </v-textare>
-    <v-btn color="green" dark absolute top right type="submit">삐약</v-btn>
+    />
+    <v-btn color="green" dark absolute top right type="submit">댓글달기</v-btn>
   </v-form>
 </template>
 
@@ -18,16 +23,17 @@
 export default {
   props: {
     //props는 최대한 자세하게
-    post: {
-      type: String,
+    postId: {
+      type: Number,
       required: true
     }
   },
   data() {
     return {
       valid: false,
-      content: null,
+      content: "",
       success: false,
+      successMessages: "",
       hideDetails: true
     };
   },
@@ -41,6 +47,7 @@ export default {
       if (value.length) {
         this.hideDetails = true;
         this.success = false;
+        this.successMessages = "";
       }
     },
     onSubmitForm() {
@@ -48,16 +55,17 @@ export default {
         this.$store
           .dispatch("posts/addComment", {
             id: Date.now(),
+            postId: this.postId,
             content: this.content,
-            PostId: this.postId,
             User: {
               nickname: this.me.nickname
             }
           })
           .then(() => {
-            this.hideDetails = false;
+            this.content = "";
             this.success = true;
-            this.content = null;
+            this.successMessages = "댓글 등록 성공!";
+            this.hideDetails = false;
           })
           .catch(() => {});
       }

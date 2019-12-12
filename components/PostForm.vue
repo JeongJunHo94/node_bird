@@ -9,11 +9,11 @@
           clearable
           label="어떤 신기한 일이 있었나요?"
           :hide-details="hideDetails"
-          :success-messages="successmessages"
+          :success-messages="successMessages"
           :success="success"
           @input="onChangeTextarea"
         />
-        <v-btn type="submit" color="green" absolute right>삐약</v-btn>
+        <v-btn type="submit" color="green" absolute right>글쓰기</v-btn>
         <v-btn>이미지 업로드</v-btn>
       </v-form>
     </v-container>
@@ -27,10 +27,9 @@ export default {
     return {
       valid: false,
       hideDetails: true,
-      successmessages: "게시글 등록 성공!",
+      successMessages: "",
       success: false,
-      content: null,
-      messages: null
+      content: ""
     };
   },
   computed: {
@@ -41,6 +40,7 @@ export default {
       if (value.length) {
         this.hideDetails = true;
         this.success = false;
+        this.successMessages = "";
       }
     },
     onSubmitForm() {
@@ -59,7 +59,8 @@ export default {
           .then(() => {
             this.hideDetails = false;
             this.success = true;
-            this.content = null;
+            this.content = "";
+            this.successMessages = "게시물 등록 성공";
           })
           .catch(() => {});
       }

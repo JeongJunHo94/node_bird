@@ -1,7 +1,7 @@
 <template>
   <div style="margin-bottom: 20px">
     <v-card>
-      <v-image />
+      <!-- <v-image /> -->
       <v-card-text>
         <div>
           <h3>{{ post.User.nickname }}</h3>
@@ -45,11 +45,12 @@
         </v-list-item>
       </v-list>
     </template>
-  </div> </template
->>
+  </div>
+</template>
 
 <script>
 import CommentForm from "~/components/CommentForm";
+
 export default {
   components: {
     CommentForm
@@ -72,10 +73,10 @@ export default {
         id: this.post.id
       });
     },
-    onEditPost() {}
-  },
-  onToggleComment() {
-    this.commentOpend = !this.commentOpened;
+    onEditPost() {},
+    onToggleComment() {
+      this.commentOpened = !this.commentOpened;
+    }
   }
 };
 </script>

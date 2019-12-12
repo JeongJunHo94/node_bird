@@ -1,10 +1,30 @@
 export const state = () => ({
-  me: null
+  me: null,
+  followerList: [
+    { value: 1, name: "팔로워1" },
+    { value: 2, name: "팔로워2" },
+    { value: 3, name: "팔로워3" }
+  ],
+  followingList: [
+    { value: 1, name: "팔로잉1" },
+    { value: 2, name: "팔로잉2" },
+    { value: 3, name: "팔로잉3" }
+  ]
 });
 
 export const mutations = {
   setMe(state, payload) {
     state.me = payload;
+  },
+  changeNickname(state, payload) {
+    state.me.nickname = payload.nickname;
+  },
+  removeFollow(state, payload) {
+    if (payload.type === "following") {
+      state.followingList.splice(payload.index, 1);
+    } else if (payload.type === "follower") {
+      state.followerList.splice(payload.index, 1);
+    }
   }
 };
 
@@ -19,5 +39,11 @@ export const actions = {
   },
   logOut({ commit }, payload) {
     commit("setMe", null);
+  },
+  changeNickname({ commit }, payload) {
+    commit("changeNickname", payload);
+  },
+  removeFollow({ commit }, payload) {
+    commit("removeFollow", payload);
   }
 };
