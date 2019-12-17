@@ -1,11 +1,9 @@
 <template>
   <v-list-item>
     <ul>
-      <li v-for="(item, index) in list" :key="index">
-        <span>{{ item.name }}</span>
-        <v-icon @click="deleteItem(index, type)"
-          >mdi-minus-circle-outline</v-icon
-        >
+      <li v-for="user in users" :key="user.id">
+        <span>{{ user.nickname }}</span>
+        <v-icon @click="remove(user.id)">mdi-minus-circle-outline</v-icon>
       </li>
     </ul>
   </v-list-item>
@@ -14,19 +12,13 @@
 <script>
 export default {
   props: {
-    list: {
-      type: Array
+    users: {
+      type: Array,
+      required: true
     },
-    type: {
-      type: String
-    }
-  },
-  methods: {
-    deleteItem(index, type) {
-      this.$store.dispatch("users/removeFollow", {
-        index,
-        type
-      });
+    remove: {
+      type: Function,
+      required: true
     }
   }
 };

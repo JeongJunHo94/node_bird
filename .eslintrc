@@ -11,6 +11,7 @@
   "plugins": [],
   "rules": {
     "vue/max-attributes-per-line": "off",
-    "vue/singleline-html-element-content-newline": "off"
+    "vue/singleline-html-element-content-newline": "off",
+    "singleQuote": "true"
   }
 }

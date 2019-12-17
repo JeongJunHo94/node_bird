@@ -18,13 +18,13 @@
       <v-card style="margin-bottom: 20px">
         <v-container>
           <v-subheader>팔로잉</v-subheader>
-          <FollowList :list="followingList" type="following" />
+          <FollowList :users="followingList" :remove="removeFollowing" />
         </v-container>
       </v-card>
       <v-card style="margin-bottom: 20px">
         <v-container>
           <v-subheader>팔로워</v-subheader>
-          <FollowList :list="followerList" type="follower" />
+          <FollowList :users="followerList" :remove="removeFollower" />
         </v-container>
       </v-card>
     </v-container>
@@ -37,6 +37,13 @@ export default {
   components: {
     FollowList
   },
+  data() {
+    return {
+      valid: false,
+      nickname: "",
+      nicknameRules: [v => !!v || "닉네임을 입력하세요"]
+    };
+  },
   computed: {
     followerList() {
       return this.$store.state.users.followerList;
@@ -46,25 +53,25 @@ export default {
       return this.$store.state.users.followingList;
     }
   },
-  data() {
-    return {
-      valid: false,
-      nickname: "",
-      nicknameRules: [v => !!v || "닉네임을 입력하세요"]
-    };
-  },
   methods: {
     onChangeNickname() {
       this.$store.dispatch("users/changeNickname", {
         nickname: this.nickname
       });
+    },
+    removeFollowing(id) {
+      this.$store.dispatch("users/removeFollowing", { id });
+    },
+    removeFollower(id) {
+      this.$store.dispatch("users/removeFollower", { id });
     }
   },
   head() {
     return {
       title: "프로필"
     };
-  }
+  },
+  middleware: "authenticated"
 };
 </script>
 
