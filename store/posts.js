@@ -1,6 +1,10 @@
 export const state = () => ({
-  mainPosts: []
+  mainPosts: [],
+  hasMorePost: true
 });
+
+const totalPosts = 51;
+const limit = 10;
 
 export const mutations = {
   addMainPost(state, payload) {
@@ -14,6 +18,23 @@ export const mutations = {
   addComment(state, payload) {
     const index = state.mainPosts.findIndex(v => v.id === payload.postId);
     state.mainPosts[index].Comments.unshift(payload);
+  },
+  loadPosts(state) {
+    const diff = totalPosts - state.mainPosts.length; //아직 안불러오고 남은 게시글의 갯수가 나옴
+    const fakePosts = Array(diff > limit ? limit : diff)
+      .fill()
+      .map(v => ({
+        id: Math.random().toString(),
+        User: {
+          id: 1,
+          nickname: "test"
+        },
+        content: `Hello scroll ${Math.random()}`,
+        Comments: [],
+        Images: []
+      }));
+    state.mainPosts = state.mainPosts.concat(fakePosts);
+    state.hasMorePost = fakePosts.length === limit;
   }
 };
 
@@ -27,5 +48,10 @@ export const actions = {
   },
   addComment({ commit }, payload) {
     commit("addComment", payload);
+  },
+  loadPosts({ commit, state }, payload) {
+    if (state.hasMorePost) {
+      commit("loadPosts");
+    }
   }
 };
