@@ -93,7 +93,8 @@ export default {
         this.$store
           .dispatch("users/signUp", {
             nickname: this.nickname,
-            email: this.emailpp
+            email: this.email,
+            password: this.password
           })
           .then(() => {
             //actions이 비동기이기 때문에 then과 catch를 추가로 써줘야 순서를 보장받을수있다.
