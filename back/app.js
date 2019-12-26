@@ -31,14 +31,20 @@ app.use(
     secret: "cookiesecret"
   })
 );
-app.use(passport.initialize());
-app.use(passport.session());
 //use는 req,res를 조작한다. 얘네를 익스프레스 미들웨어라고 부른다. 사실 get이나 post도 미들웨어라고 한다.
 //요청이 들어오면 위에서부터 실행이 된다. 하나씩 훑어서 내려와서 use가 중간에 걸러주기 때문에 미들웨어라고 보면 된다.
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get("/", (req, res) => {
   res.send("안녕 123");
 });
+
+const user = {
+  // 'asdfasdfasdf' : 1,
+  // 'asdfasdfsdad' : 2,
+  // 'fasdsfdafsdf' : 3
+};
 
 app.post("/user", async (req, res, next) => {
   try {
@@ -74,16 +80,41 @@ app.post("/user", async (req, res, next) => {
 const user = {};
 
 app.post("/user/login", (req, res) => {
-  //이메일과 비밀번호를 받아서 세션을 구성해야함
-  req.body.email;
-  req.body.password;
-  // user[user.id]={};이런식으로 하기도 하지만, 실무에서는 passport모듈을 사용한다.
+  //err.user.info 매개변수가 3개인 이유는 local의 LocalStrategy의 에러,성공,실패 done 인자때문
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      console.error(err);
+      return next(err);
+    }
+    if (info) {
+      //프론트쪽에서 잘못된 요청이기 떄문에 에러처리가 아닌 401거절
+      return res.status(401).send(info.reason);
+    }
+    //로그인이 성공하면 해당 유저의 정보가 user에 담겨있다.세션에다가 사용자 정보를 저장한다.
+    //매개변수를 항상 추적해라. 아래 user는 결국 DB의 exUser로부터 왔다.
+    //세션에다가 사용자 정보를 어떻게 저장할 것인가? -> passport index의 serializeUser
+    //쿠키이름은 connect.Sid, 프론트쪽에 쿠키를 보내줘야하는 것도 req.login이 대신 해준다.
+    return req.login(user, async err => {
+      if (err) {
+        console.error(err);
+        return next(err);
+      }
+      //쿠키는 header정보를 내려보내주고, body정보는 json(user)를 통해 같이 내려보내준다
+      return res.json(user);
+    });
+  })(req, res, next);
 
-  //이메일과 패스워드 검사를 먼저 진행, 일치한다? -> 세션에 쿠키와 객체를 저장
-  // await db.User.findOne();
-  user[cookie] = "유저정보"; //쿠키를 키로 삼아서 유저정보 저장
-  //그 뒤에 프론트에 쿠키 내려보내주기 = 이게 바로 로그인이다.
-  //과정이 복잡하고 세션도 간단히 만드는게 아니라 패스포트를 사용한다고 보면 된다.
+  //local.js구성에 따라 local쪽으로 기능이 대체됨.
+  // //이메일과 비밀번호를 받아서 세션을 구성해야함
+  // req.body.email;
+  // req.body.password;
+  // // user[user.id]={};이런식으로 하기도 하지만, 실무에서는 passport모듈을 사용한다.
+
+  // //이메일과 패스워드 검사를 먼저 진행, 일치한다? -> 세션에 쿠키와 객체를 저장
+  // // await db.User.findOne();
+  // user[cookie] = "유저정보"; //쿠키를 키로 삼아서 유저정보 저장
+  // //그 뒤에 프론트에 쿠키 내려보내주기 = 이게 바로 로그인이다.
+  // //과정이 복잡하고 세션도 간단히 만드는게 아니라 패스포트를 사용한다고 보면 된다.
 });
 
 app.listen(3085, () => {
