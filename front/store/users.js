@@ -57,18 +57,54 @@ export const mutations = {
 
 export const actions = {
   signUp({ commit, state }, payload) {
-    this.$axios.post("http://localhost:3085/user", {
-      //REST API 그러나 대부분 REST 비스무리한 API, HTTP API
-      email: payload.email,
-      nickname: payload.nickname,
-      password: payload.password
-    });
-    commit("setMe", payload);
+    this.$axios
+      .post(
+        "http://localhost:3085/user",
+        {
+          //REST API 그러나 대부분 REST 비스무리한 API, HTTP API
+          email: payload.email,
+          nickname: payload.nickname,
+          password: payload.password
+          //위에서 요청을 보내고 그 응답이 밑의 data에 담겨있다.
+        },
+        {
+          //프론트와 백의 주소가 달라서 문제가 생겼을때, 주소가 달라도 쿠키가 저장되게 해준다.
+          withCredentials: true
+        }
+      )
+      .then(data => {
+        console.log(data);
+        commit("setMe", payload);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+    // commit("setMe", payload);
     //서버에 회원가입 요청을 보내고 응답을 받은 후에 회원정보 me를 바꿔준다.
     //여기서 payload는 회원정보가 될 예정
   },
   logIn({ commit }, payload) {
-    commit("setMe", payload);
+    this.$axios
+      .post(
+        "http://localhost:3085/user/login",
+        {
+          //REST API 그러나 대부분 REST 비스무리한 API, HTTP API
+          email: payload.email,
+          password: payload.password
+        },
+        {
+          //프론트와 백의 주소가 달라서 문제가 생겼을때, 주소가 달라도 쿠키가 저장되게 해준다.
+          withCredentials: true
+        }
+      )
+      .then(data => {
+        console.log(data);
+        commit("setMe", payload);
+        //요청이 실패했을 경우도 대비
+      })
+      .catch(err => {
+        console.error(err);
+      });
   },
   logOut({ commit }, payload) {
     commit("setMe", null);

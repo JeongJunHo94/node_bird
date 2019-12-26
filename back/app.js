@@ -7,18 +7,24 @@ const session = require("express-session");
 const cookie = require("cookie-parser");
 
 const db = require("./models");
-const passwordConfig = require("./passport");
+const passportConfig = require("./passport");
 const app = express();
 
 //서버시작할때 app.js가 실행되면서 db.sequelize.sync가 같이 실행됨
 //sync괄호 옆의 force:true하면 서버 열때마다 데이터가 초기화된다.
 db.sequelize.sync();
-// passportConfig();
+passportConfig();
 
 //서버에서 요청이 오면 기록을 해준다.morgan은 맨 위에 위치할 것.
 app.use(morgan("dev"));
 //괄호안을 비워두면 모든요청을 허용하는것. 실무에서는 절대 하지않는다.
-app.use(cors("http://localhost:3000"));
+app.use(
+  cors({
+    //주소가 달라서 withCredentials을 썼을때 뜨는 에러때문에 추가
+    origin: "http://localhost:3000",
+    credentials: true
+  })
+);
 //이게 있어야만 json으로 온 데이터를 파싱해서 req바디에 넣어준다.
 //form을 통해서 전송할때 그 데이터 해석해서 req바디에 넣어준다.
 app.use(express.json());
@@ -28,7 +34,11 @@ app.use(
   session({
     resave: false,
     saveUninitialized: false,
-    secret: "cookiesecret"
+    secret: "cookiesecret",
+    cookie: {
+      httpOnly: true,
+      secure: false
+    }
   })
 );
 //use는 req,res를 조작한다. 얘네를 익스프레스 미들웨어라고 부른다. 사실 get이나 post도 미들웨어라고 한다.
@@ -40,18 +50,12 @@ app.get("/", (req, res) => {
   res.send("안녕 123");
 });
 
-const user = {
-  // 'asdfasdfasdf' : 1,
-  // 'asdfasdfsdad' : 2,
-  // 'fasdsfdafsdf' : 3
-};
-
 app.post("/user", async (req, res, next) => {
   try {
     //사람을 저장하면 저장된 결과가 newUser로 나온다.
     //그 결과를 밑의 json으로 응답하는 것.
     const hash = await bcrypt.hash(req.body.password, 10);
-    const exUser = db.User.findOne({
+    const exUser = await db.User.findOne({
       email: req.body.email
     });
     //이미 회원가입되어있으면
@@ -61,13 +65,34 @@ app.post("/user", async (req, res, next) => {
         message: "이미 존재하는 email주소입니다."
       });
     }
-    const newUser = await db.User.create({
+    await db.User.create({
+      // const newUser = await db.User.create({
       email: req.body.email,
       password: hash,
       nickname: req.body.nickname
-    });
-    //HTTP STATUS CODE 한번 확인해볼것.
-    return res.status(201).json(newUser); //201은 성공적으로 생성했다, 200은 성공
+    }); //HTTP STATUS CODE
+    //
+    //밑의 회원가입과 동일하게 이부분을 복사해왔다.
+
+    //회원가입시 회원검사를 한 후, create로 회원 등록을 하고, 그정보를 그대로 login에 사용
+    passport.authenticate("local", (err, user, info) => {
+      if (err) {
+        console.error(err);
+        return next(err);
+      }
+      if (info) {
+        return res.status(401).send(info.reason);
+      }
+      return req.login(user, async err => {
+        if (err) {
+          console.error(err);
+          return next(err);
+        }
+        return res.json(user);
+      });
+    })(req, res, next);
+
+    // return res.status(201).json(newUser); //201은 성공적으로 생성했다, 200은 성공
   } catch (err) {
     console.log(err);
     return next(err);
@@ -79,7 +104,7 @@ app.post("/user", async (req, res, next) => {
 //문제는 그 키를 쿠키로 보내주기 때문에, app.use(cookie())를 쓴것. 쿠키를 기반으로 사용자를 찾는다.
 const user = {};
 
-app.post("/user/login", (req, res) => {
+app.post("/user/login", (req, res, next) => {
   //err.user.info 매개변수가 3개인 이유는 local의 LocalStrategy의 에러,성공,실패 done 인자때문
   passport.authenticate("local", (err, user, info) => {
     if (err) {
