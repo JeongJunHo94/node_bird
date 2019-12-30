@@ -102,7 +102,6 @@ app.post("/user", async (req, res, next) => {
 //힙이라는 곳에 메모리로 존재한다.
 //프론트에서 '키'를 보내주면 express-session 미들웨어에서는 그 키를 가지고 찾는다.
 //문제는 그 키를 쿠키로 보내주기 때문에, app.use(cookie())를 쓴것. 쿠키를 기반으로 사용자를 찾는다.
-const user = {};
 
 app.post("/user/login", (req, res, next) => {
   //err.user.info 매개변수가 3개인 이유는 local의 LocalStrategy의 에러,성공,실패 done 인자때문
@@ -140,6 +139,19 @@ app.post("/user/login", (req, res, next) => {
   // user[cookie] = "유저정보"; //쿠키를 키로 삼아서 유저정보 저장
   // //그 뒤에 프론트에 쿠키 내려보내주기 = 이게 바로 로그인이다.
   // //과정이 복잡하고 세션도 간단히 만드는게 아니라 패스포트를 사용한다고 보면 된다.
+
+  app.post("/logout", (req, res) => {
+    if (req.isAuthenticated()) {
+      req.logout();
+      req.session.destroy(); //로그아웃시 세션까지 전부 지우려고 한다. 다른정보도 들어있을수 있기 때문에
+      return res.status(200).send("로그아웃 되었습니다.");
+    }
+  });
+
+  app.post("/user/post", (req, res) => {
+    if (req.isAuthenticated()) {
+    }
+  });
 });
 
 app.listen(3085, () => {
