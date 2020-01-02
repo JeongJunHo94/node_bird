@@ -72,9 +72,8 @@ export const actions = {
           withCredentials: true
         }
       )
-      .then(data => {
-        console.log(data);
-        commit("setMe", payload);
+      .then(res => {
+        commit("setMe", res.data);
       })
       .catch(err => {
         console.error(err);
@@ -97,17 +96,24 @@ export const actions = {
           withCredentials: true
         }
       )
-      .then(data => {
-        console.log(data);
-        commit("setMe", payload);
+      //비동기여서 then 이나 async await 사용
+      .then(res => {
+        commit("setMe", res.data);
         //요청이 실패했을 경우도 대비
       })
       .catch(err => {
         console.error(err);
       });
   },
-  logOut({ commit }, payload) {
-    commit("setMe", null);
+  logOut({ commit }) {
+    this.$axios
+      .post("http://localhost:3085/user/logout", {}, { withCredentials: true })
+      .then(data => {
+        commit("setMe", null);
+      })
+      .catch(err => {
+        console.error(err);
+      });
   },
   changeNickname({ commit }, payload) {
     commit("changeNickname", payload);
