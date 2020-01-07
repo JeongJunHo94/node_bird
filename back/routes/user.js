@@ -2,12 +2,13 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const db = require("../models");
+const { isLoggedIn, isNotLoggedIn } = require("./middlewares");
 
 const router = express.Router();
 
 //원래 app.post였으나 router이관에 따라 router.post로 변경
 //또한 "/user"부분을 없애주어야한다. 왜냐하면 app.use에 이미 'user'가 있다.
-router.post("/", async (req, res, next) => {
+router.post("/", isNotLoggedIn, async (req, res, next) => {
   try {
     //사람을 저장하면 저장된 결과가 newUser로 나온다.
     //그 결과를 밑의 json으로 응답하는 것.
@@ -62,7 +63,7 @@ router.post("/", async (req, res, next) => {
 //문제는 그 키를 쿠키로 보내주기 때문에, app.use(cookie())를 쓴것. 쿠키를 기반으로 사용자를 찾는다.
 
 //사실 user/login/이다.
-router.post("/login", (req, res, next) => {
+router.post("/login", isNotLoggedIn, (req, res, next) => {
   //err.user.info 매개변수가 3개인 이유는 local의 LocalStrategy의 에러,성공,실패 done 인자때문
   passport.authenticate("local", (err, user, info) => {
     if (err) {
@@ -101,7 +102,7 @@ router.post("/login", (req, res, next) => {
 // //과정이 복잡하고 세션도 간단히 만드는게 아니라 패스포트를 사용한다고 보면 된다.
 
 //사용자가 로그인을 해 있어야 로그아웃이 가능하다. 따라서 로그인을 검사 해봐야한다.
-router.post("/logout", (req, res) => {
+router.post("/logout", isLoggedIn, (req, res) => {
   if (req.isAuthenticated()) {
     req.logout();
     req.session.destroy(); //로그아웃시 세션까지 전부 지우려고 한다. 다른정보도 들어있을수 있기 때문에

@@ -93,3 +93,10 @@ sw.*
 
 .cmd
 
+*.cmd
+*.ps1
+nopt
+nodetouch
+rc
+which
+is-ci

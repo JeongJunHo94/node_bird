@@ -9,6 +9,7 @@ const morgan = require("morgan");
 const db = require("./models");
 const passportConfig = require("./passport");
 const userRouter = require("./routes/user");
+const postRouter = require("./routes/post");
 const app = express();
 
 //서버시작할때 app.js가 실행되면서 db.sequelize.sync가 같이 실행됨
@@ -53,12 +54,12 @@ app.get("/", (req, res) => {
 });
 
 app.use("/user", userRouter);
+app.use("/post", postRouter);
 
 //routes/user로 app.post(login, logout, local등등) 이관시켰다
 
-app.post("/user/post", (req, res) => {
-  if (req.isAuthenticated()) {
-  }
+app.post("/post", (req, res) => {
+  //현재 사용자가 로그인 했는지 안했는지 파악
 });
 
 app.listen(3085, () => {
